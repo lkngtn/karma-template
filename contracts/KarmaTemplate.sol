@@ -55,8 +55,10 @@ contract GardensTemplate is BaseTemplate {
     * @dev Create the DAO and initialise the basic apps necessary for gardens
     * @param _voteTokenName The name for the token used by share holders in the organization
     * @param _voteTokenSymbol The symbol for the token used by share holders in the organization
+    * @param _holders some text for _holders
+    * @param _stakes some text for _stakes
     * @param _votingSettings Array of [supportRequired, minAcceptanceQuorum, voteDuration, voteBufferBlocks, voteExecutionDelayBlocks] to set up the voting app of the organization
-    * @param _useAgentAsVault Whether to use an Agent app or Vault app
+
     */
     function createDaoTxOne(
         string _voteTokenName,
@@ -89,12 +91,10 @@ contract GardensTemplate is BaseTemplate {
 
     /**
     * @dev Add and initialise tollgate, redemptions and conviction voting or finance apps
+    * @param _id some text for id
     * @param _tollgateFeeToken The token used to pay the tollgate fee
     * @param _tollgateFeeAmount The tollgate fee amount
-    * @param _redeemableTokens Array of initially redeemable tokens
-    * @param _useConvictionAsFinance Whether to use conviction voting or finance
-    * @param _financePeriod Finance period
-    * @param _collateralToken Token distributed by conviction voting and used as collateral in fundraising
+    * @param _issuanceRate some text for issuance
     */
     function createDaoTxTwo(
         string _id,
