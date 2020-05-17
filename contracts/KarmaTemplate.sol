@@ -19,7 +19,7 @@ contract GardensTemplate is BaseTemplate {
     bytes32 private constant DANDELION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("dandelion-voting")));
     bytes32 private constant CONVICTION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("conviction-voting")));
     bytes32 private constant HOOKED_TOKEN_MANAGER_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("hooked-token-manager")));
-    bytes32 private constant ISSUANCE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("issuance")));
+    bytes32 private constant ISSUANCE_APP_ID = keccak256(abi.encodePacked(keccak256("issuance")));
     bytes32 private constant TOLLGATE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("tollgate")));
 
 
@@ -107,7 +107,7 @@ contract GardensTemplate is BaseTemplate {
         require(_tollgateFeeToken != address(0), ERROR_NO_TOLLGATE_TOKEN);
         require(senderDeployedContracts[msg.sender].dao != address(0), ERROR_NO_CACHE);
 
-        (,
+        (Kernel dao,
         ACL acl,
         DandelionVoting dandelionVoting,
         Vault fundingPoolVault,
@@ -130,10 +130,9 @@ contract GardensTemplate is BaseTemplate {
         hookedTokenManager.registerHook(convictionVoting);
         hookedTokenManager.registerHook(dandelionVoting);
         _removePermissionFromTemplate(acl, hookedTokenManager, hookedTokenManager.SET_HOOK_ROLE());
-        _createHookedTokenManagerPermissions(issuance);
+        _createHookedTokenManagerPermissions(acl, dandelionVoting, hookedTokenManager, issuance);
 
         _validateId(_id);
-        (Kernel dao, ACL acl, DandelionVoting dandelionVoting,,) = _getDeployedContractsTxOne();
         _transferRootPermissionsFromTemplateAndFinalizeDAO(dao, dandelionVoting);
         _registerID(_id, dao);
         _deleteStoredContracts();
@@ -217,8 +216,8 @@ contract GardensTemplate is BaseTemplate {
         _acl.createPermission(ANY_ENTITY, _convictionVoting, _convictionVoting.CREATE_PROPOSALS_ROLE(), _dandelionVoting);
     }
 
-    function _createHookedTokenManagerPermissions(Issuance issuance) internal {
-        (, ACL acl,DandelionVoting dandelionVoting,,HookedTokenManager hookedTokenManager) = _getDeployedContractsTxOne();
+    function _createHookedTokenManagerPermissions(ACL acl, DandelionVoting dandelionVoting,HookedTokenManager hookedTokenManager, Issuance issuance) internal {
+        // (, ACL acl,DandelionVoting dandelionVoting,,HookedTokenManager hookedTokenManager) = _getDeployedContractsTxOne();
 
         acl.createPermission(issuance, hookedTokenManager, hookedTokenManager.MINT_ROLE(), dandelionVoting);
         // acl.createPermission(issuance, hookedTokenManager, hookedTokenManager.ISSUE_ROLE(), dandelionVoting);
