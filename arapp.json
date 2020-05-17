@@ -1,0 +1,20 @@
+{
+  "environments": {
+    "default": {
+      "appName": "karma-template.aragonpm.eth",
+      "registry": "0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1",
+      "network": "rpc"
+    },
+    "devnet": {
+      "appName": "karma-template.aragonpm.eth",
+      "network": "devnet"
+    },
+    "rinkeby": {
+      "appName": "gardens-template.aragonpm.eth",
+      "address": "0x17b06597b35b0beb3aa2bc4014fa4cf3cbfbf49c",
+      "network": "rinkeby",
+      "registry": "0x98Df287B6C145399Aaa709692c8D308357bC085D"
+    }
+  },
+  "path": "contracts/GardensTemplate.sol"
+}
