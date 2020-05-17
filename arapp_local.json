@@ -1,11 +1,11 @@
 {
   "environments": {
     "devnet": {
-      "appName": "gardens-template.aragonpm.eth",
-      "address": "0x9dd2ba932306a0b49f22b5930b0bf96ab65fc0ae",
+      "appName": "karma-template.aragonpm.eth",
+      "address": "0xbcc05546d93c19081fd155d7864fddffffed4a60",
       "network": "devnet",
       "registry": "0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1"
     }
   },
-  "path": "contracts/GardensTemplate.sol"
+  "path": "contracts/KarmaTemplate.sol"
 }

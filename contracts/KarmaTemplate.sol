@@ -8,7 +8,7 @@ import {ITollgate as Tollgate} from "./external/ITollgate.sol";
 import {IConvictionVoting as ConvictionVoting} from "./external/IConvictionVoting.sol";
 
 
-contract GardensTemplate is BaseTemplate {
+contract KarmaTemplate is BaseTemplate {
 
     string constant private ERROR_MISSING_MEMBERS = "MISSING_MEMBERS";
     string constant private ERROR_BAD_VOTE_SETTINGS = "BAD_SETTINGS";
@@ -16,10 +16,10 @@ contract GardensTemplate is BaseTemplate {
     string constant private ERROR_NO_TOLLGATE_TOKEN = "NO_TOLLGATE_TOKEN";
 
 
-    bytes32 private constant DANDELION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("dandelion-voting")));
-    bytes32 private constant CONVICTION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("conviction-voting")));
-    bytes32 private constant HOOKED_TOKEN_MANAGER_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("hooked-token-manager")));
-    bytes32 private constant ISSUANCE_APP_ID = keccak256(abi.encodePacked(keccak256("issuance")));
+    bytes32 private constant DANDELION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-dandelion-voting")));
+    bytes32 private constant CONVICTION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-dependency")));
+    bytes32 private constant HOOKED_TOKEN_MANAGER_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-token-manager")));
+    bytes32 private constant ISSUANCE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("issuance")));
     bytes32 private constant TOLLGATE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("tollgate")));
 
 
@@ -37,6 +37,7 @@ contract GardensTemplate is BaseTemplate {
         Vault fundingPoolVault;
         HookedTokenManager hookedTokenManager;
         Issuance issuance;
+        MiniMeToken voteToken;
     }
 
     mapping(address => DeployedContracts) internal senderDeployedContracts;
@@ -86,34 +87,37 @@ contract GardensTemplate is BaseTemplate {
         _createEvmScriptsRegistryPermissions(acl, dandelionVoting, dandelionVoting);
         _createCustomVotingPermissions(acl, dandelionVoting, hookedTokenManager);
 
-        _storeDeployedContractsTxOne(dao, acl, dandelionVoting, fundingPoolVault, hookedTokenManager);
+        _storeDeployedContractsTxOne(dao, acl, dandelionVoting, fundingPoolVault, hookedTokenManager, voteToken);
     }
 
     /**
-    * @dev Add and initialise tollgate, redemptions and conviction voting or finance apps
+    * @dev Add and initialise tollgate, issuance and conviction voting
     * @param _id some text for id
-    * @param _tollgateFeeToken The token used to pay the tollgate fee
     * @param _tollgateFeeAmount The tollgate fee amount
-    * @param _issuanceRate some text for issuance
+    * @param _issuanceRate Percentage of the token's total supply that will be issued per block (expressed as a percentage of 10^18; eg. 10^16 = 1%, 10^18 = 100%)
+    * @param _convictionSettings array of conviction settings: decay, max_ratio, and weight
     */
     function createDaoTxTwo(
         string _id,
-        ERC20 _tollgateFeeToken,
         uint256 _tollgateFeeAmount,
-        uint256 _issuanceRate
+        uint256 _issuanceRate,
+        uint64[3] _convictionSettings
+
     )
         public
     {
-        require(_tollgateFeeToken != address(0), ERROR_NO_TOLLGATE_TOKEN);
         require(senderDeployedContracts[msg.sender].dao != address(0), ERROR_NO_CACHE);
 
         (Kernel dao,
         ACL acl,
         DandelionVoting dandelionVoting,
         Vault fundingPoolVault,
-        HookedTokenManager hookedTokenManager) = _getDeployedContractsTxOne();
+        HookedTokenManager hookedTokenManager,
+        MiniMeToken voteToken) = _getDeployedContractsTxOne();
 
-        Tollgate tollgate = _installTollgate(senderDeployedContracts[msg.sender].dao, _tollgateFeeToken, _tollgateFeeAmount, address(fundingPoolVault));
+        ERC20 feeToken = ERC20(address(voteToken));
+
+        Tollgate tollgate = _installTollgate(senderDeployedContracts[msg.sender].dao, feeToken, _tollgateFeeAmount, address(fundingPoolVault));
         _createTollgatePermissions(acl, tollgate, dandelionVoting);
 
         Issuance issuance = _installIssuance(senderDeployedContracts[msg.sender].dao, hookedTokenManager);
@@ -122,7 +126,7 @@ contract GardensTemplate is BaseTemplate {
         _removePermissionFromTemplate(acl, issuance, issuance.ADD_POLICY_ROLE());
         _createIssuancePermissions(acl, issuance, dandelionVoting);
 
-        ConvictionVoting convictionVoting = _installConvictionVoting(senderDeployedContracts[msg.sender].dao, hookedTokenManager.token(), fundingPoolVault, hookedTokenManager.token());
+        ConvictionVoting convictionVoting = _installConvictionVoting(senderDeployedContracts[msg.sender].dao, hookedTokenManager.token(), fundingPoolVault, hookedTokenManager.token(), _convictionSettings);
         _createVaultPermissions(acl, fundingPoolVault, convictionVoting, dandelionVoting);
         _createConvictionVotingPermissions(acl, convictionVoting, dandelionVoting);
 
@@ -180,11 +184,11 @@ contract GardensTemplate is BaseTemplate {
       return issuance;
     }
 
-    function _installConvictionVoting(Kernel _dao, MiniMeToken _stakeToken, Vault _agentOrVault, address _requestToken)
+    function _installConvictionVoting(Kernel _dao, MiniMeToken _stakeToken, Vault _agentOrVault, MiniMeToken _requestToken, uint64[3] _convictionSettings)
         internal returns (ConvictionVoting)
     {
         ConvictionVoting convictionVoting = ConvictionVoting(_installNonDefaultApp(_dao, CONVICTION_VOTING_APP_ID));
-        convictionVoting.initialize(_stakeToken, _agentOrVault, _requestToken);
+        convictionVoting.initialize(_stakeToken, _agentOrVault, _requestToken, _convictionSettings[0], _convictionSettings[1], _convictionSettings[2]);
         return convictionVoting;
     }
 
@@ -229,7 +233,7 @@ contract GardensTemplate is BaseTemplate {
 
     // Temporary Storage functions //
 
-    function _storeDeployedContractsTxOne(Kernel _dao, ACL _acl, DandelionVoting _dandelionVoting, Vault _agentOrVault, HookedTokenManager _hookedTokenManager)
+    function _storeDeployedContractsTxOne(Kernel _dao, ACL _acl, DandelionVoting _dandelionVoting, Vault _agentOrVault, HookedTokenManager _hookedTokenManager, MiniMeToken _voteToken )
         internal
     {
         DeployedContracts storage deployedContracts = senderDeployedContracts[msg.sender];
@@ -238,16 +242,18 @@ contract GardensTemplate is BaseTemplate {
         deployedContracts.dandelionVoting = _dandelionVoting;
         deployedContracts.fundingPoolVault = _agentOrVault;
         deployedContracts.hookedTokenManager = _hookedTokenManager;
+        deployedContracts.voteToken = _voteToken;
     }
 
-    function _getDeployedContractsTxOne() internal returns (Kernel, ACL, DandelionVoting, Vault, HookedTokenManager) {
+    function _getDeployedContractsTxOne() internal returns (Kernel, ACL, DandelionVoting, Vault, HookedTokenManager, MiniMeToken voteToken) {
         DeployedContracts storage deployedContracts = senderDeployedContracts[msg.sender];
         return (
             deployedContracts.dao,
             deployedContracts.acl,
             deployedContracts.dandelionVoting,
             deployedContracts.fundingPoolVault,
-            deployedContracts.hookedTokenManager
+            deployedContracts.hookedTokenManager,
+            deployedContracts.voteToken
         );
     }
 

@@ -10,11 +10,11 @@
       "network": "devnet"
     },
     "rinkeby": {
-      "appName": "gardens-template.aragonpm.eth",
-      "address": "0x17b06597b35b0beb3aa2bc4014fa4cf3cbfbf49c",
+      "appName": "karma-template.aragonpm.eth",
+      "address": "0x3f7cd12357f16220e8ab9a9ec7ef2e9e0fb6df63",
       "network": "rinkeby",
       "registry": "0x98Df287B6C145399Aaa709692c8D308357bC085D"
     }
   },
-  "path": "contracts/GardensTemplate.sol"
+  "path": "contracts/KarmaTemplate.sol"
 }
