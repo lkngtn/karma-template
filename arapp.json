@@ -9,6 +9,12 @@
       "appName": "karma-template.aragonpm.eth",
       "network": "devnet"
     },
+    "xdai": {
+      "registry": "0xaafca6b0c89521752e559650206d7c925fd0e530",
+      "address": "0x9b321667c89cf888785413b89178b78dc67747c8",
+      "appName": "karma-template.1hive.aragonpm.eth",
+      "network": "xdai"
+    },
     "rinkeby": {
       "appName": "karma-template.aragonpm.eth",
       "address": "0x3f7cd12357f16220e8ab9a9ec7ef2e9e0fb6df63",

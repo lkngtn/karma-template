@@ -15,12 +15,20 @@ contract KarmaTemplate is BaseTemplate {
     string constant private ERROR_NO_CACHE = "NO_CACHE";
     string constant private ERROR_NO_TOLLGATE_TOKEN = "NO_TOLLGATE_TOKEN";
 
+    //
+    // bytes32 private constant DANDELION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-dandelion-voting")));
+    // bytes32 private constant CONVICTION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-dependency")));
+    // bytes32 private constant HOOKED_TOKEN_MANAGER_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-token-manager")));
+    // bytes32 private constant ISSUANCE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("issuance")));
+    // bytes32 private constant TOLLGATE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("tollgate")));
 
-    bytes32 private constant DANDELION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-dandelion-voting")));
-    bytes32 private constant CONVICTION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-dependency")));
-    bytes32 private constant HOOKED_TOKEN_MANAGER_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("gardens-token-manager")));
-    bytes32 private constant ISSUANCE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("issuance")));
-    bytes32 private constant TOLLGATE_APP_ID = keccak256(abi.encodePacked(apmNamehash("open"), keccak256("tollgate")));
+    // xdai
+
+    bytes32 private constant DANDELION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("1hive"), keccak256("dandelion-voting")));
+    bytes32 private constant CONVICTION_VOTING_APP_ID = keccak256(abi.encodePacked(apmNamehash("1hive"), keccak256("conviction-voting")));
+    bytes32 private constant HOOKED_TOKEN_MANAGER_APP_ID = keccak256(abi.encodePacked(apmNamehash("1hive"), keccak256("token-manager")));
+    bytes32 private constant ISSUANCE_APP_ID = keccak256(abi.encodePacked(apmNamehash("1hive"), keccak256("issuance")));
+    bytes32 private constant TOLLGATE_APP_ID = keccak256(abi.encodePacked(apmNamehash("1hive"), keccak256("tollgate")));
 
 
     bool private constant TOKEN_TRANSFERABLE = true;
@@ -92,13 +100,11 @@ contract KarmaTemplate is BaseTemplate {
 
     /**
     * @dev Add and initialise tollgate, issuance and conviction voting
-    * @param _id some text for id
     * @param _tollgateFeeAmount The tollgate fee amount
     * @param _issuanceRate Percentage of the token's total supply that will be issued per block (expressed as a percentage of 10^18; eg. 10^16 = 1%, 10^18 = 100%)
     * @param _convictionSettings array of conviction settings: decay, max_ratio, and weight
     */
     function createDaoTxTwo(
-        string _id,
         uint256 _tollgateFeeAmount,
         uint256 _issuanceRate,
         uint64[3] _convictionSettings
@@ -136,9 +142,9 @@ contract KarmaTemplate is BaseTemplate {
         _removePermissionFromTemplate(acl, hookedTokenManager, hookedTokenManager.SET_HOOK_ROLE());
         _createHookedTokenManagerPermissions(acl, dandelionVoting, hookedTokenManager, issuance);
 
-        _validateId(_id);
+        // _validateId(_id);
         _transferRootPermissionsFromTemplateAndFinalizeDAO(dao, dandelionVoting);
-        _registerID(_id, dao);
+        // _registerID(_id, dao);
         _deleteStoredContracts();
     }
 

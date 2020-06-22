@@ -2,9 +2,9 @@
   "environments": {
     "devnet": {
       "appName": "karma-template.aragonpm.eth",
-      "address": "0xbcc05546d93c19081fd155d7864fddffffed4a60",
+      "address": "0x9b321667c89cf888785413b89178b78dc67747c8",
       "network": "devnet",
-      "registry": "0x5f6f7e8cc7346a11ca2def8f827b7a0b612c56a1"
+      "registry": "0xaafca6b0c89521752e559650206d7c925fd0e530"
     }
   },
   "path": "contracts/KarmaTemplate.sol"
